@@ -1,1 +1,333 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feliz Día de la Madre</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background: #fff0f5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
 
+    #heart-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 60vh;
+      margin-top: 20px;
+    }
+
+    #heart {
+      width: 300px;
+      max-width: 80vw;
+      height: 300px;
+      background-image: url('https://i.postimg.cc/xTgR4WtF/371244029-11475329.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      cursor: pointer;
+      animation: heartbeat 2s infinite ease-in-out;
+    }
+
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      25% { transform: scale(1.1); }
+      50% { transform: scale(1); }
+      75% { transform: scale(1.1); }
+    }
+
+    #heart:hover {
+      transform: scale(1.05);
+    }
+
+    #letter {
+      display: none;
+      max-width: 90%;
+      background-color: #fff;
+      padding: 20px;
+      margin-top: 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      text-align: center;
+      color: #c71585;
+      font-size: 1.2rem;
+      line-height: 1.6;
+      animation: fadeIn 1s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .audio-controls {
+      margin-top: 20px;
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      width: 90%;
+      max-width: 400px;
+    }
+
+    .audio-controls button {
+      background-color: #ff69b4;
+      border: none;
+      color: white;
+      padding: 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      font-size: 1rem;
+    }
+
+    .audio-controls button:hover {
+      background-color: #c71585;
+    }
+
+    #restart-btn {
+      margin-top: 20px;
+      background-color: #ff1493;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+      display: none;
+    }
+
+    #restart-btn:hover {
+      background-color: #c71585;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    h1 {
+      color: #ff1493;
+      font-size: 2.5em;
+      text-align: center;
+      width: 100%;
+    }
+
+    #cake {
+      width: 80px;
+      position: absolute;
+      transition: 0.2s;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+
+    #corazon {
+      display: none;
+      width: 100%;
+    }
+
+    #content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      order: 2;
+      width: 100%;
+    }
+
+    #press-heart-text {
+      animation: fadeIn 1s ease;
+      transition: opacity 0.5s ease;
+      text-align: center;
+    }
+
+    .fade-out {
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>¡Atrapa la carta! 💌</h1>
+  <img id="cake" src="https://i.postimg.cc/gknhYF8j/1f48c-color.png" alt="Pastel">
+
+  <div id="corazon">
+    <div id="heart-container">
+      <h1 id="press-heart-text">¡Presiona el corazón! 💖</h1>
+      <div id="heart" onclick="showLetterAndPlay()"></div>
+    </div>
+
+    <div id="content">
+      <div id="letter">
+        <p>💐 Con todo mi amor para la mujer más maravillosa del mundo 🌺 <br>
+
+          <br>
+            En este día tan especial quiero recordarte lo mucho que te amo y lo agradecido que estoy por todo lo que haces día a día por mí. Eres mi guía, mi apoyo y mi inspiración. Gracias por cada abrazo, cada palabra de aliento y cada lección que me brindas con tanto amor. No me alcanzan las palabras para expresarte lo importante y valiosa que eres para mí. Sin duda alguna puedo decir que eres la mejor mamá del mundo. Por eso y mucho más ¡feliz Día, mamá!💘.
+          <br>
+          <br>
+
+            💖🌻🌹🥰
+
+          <br>
+      </p>
+      </div>
+
+      <div class="audio-controls">
+        <button onclick="playMusic()">▶️ Reproducir Música</button>
+        <button onclick="pauseMusic()">⏸️ Pausar Música</button>
+      </div>
+
+      <button id="restart-btn" onclick="restartPage()">🔁 Volver al inicio</button>
+
+      <audio id="bg-music" loop>
+        <source src="https://www.bensound.com/bensound-music/bensound-tenderness.mp3" type="audio/mpeg">
+        Tu navegador no soporta audio HTML5.
+      </audio>
+
+      <canvas id="confetti"></canvas>
+
+      <script>
+        const canvas = document.getElementById('confetti');
+        const ctx = canvas.getContext('2d');
+        let petals = [];
+        const numberOfPetals = 50;
+
+        const petalImg = new Image();
+        petalImg.src = 'https://i.postimg.cc/zvyQktD2/descarga-1.png';
+
+        function resizeCanvas() {
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function createPetal() {
+          return {
+            x: Math.random() * canvas.width,
+            y: Math.random() * -canvas.height,
+            size: Math.random() * 40 + 20,
+            speed: Math.random() * 1.5 + 0.5,
+            angle: Math.random() * 2 * Math.PI,
+            spin: (Math.random() - 0.5) * 0.1
+          };
+        }
+
+        function startPetalRain() {
+          petals = [];
+          for (let i = 0; i < numberOfPetals; i++) {
+            petals.push(createPetal());
+          }
+          animatePetals();
+        }
+
+        function animatePetals() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          petals.forEach((p, i) => {
+            p.y += p.speed;
+            p.x += Math.sin(p.y * 0.01) * 1.5;
+            p.angle += p.spin;
+
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.angle);
+            ctx.drawImage(petalImg, -p.size / 2, -p.size / 2, p.size, p.size);
+            ctx.restore();
+
+            if (p.y > canvas.height) {
+              petals[i] = createPetal();
+            }
+          });
+          requestAnimationFrame(animatePetals);
+        }
+
+        function showLetterAndPlay() {
+          const heartText = document.getElementById('press-heart-text');
+          heartText.classList.add('fade-out');
+          setTimeout(() => {
+            heartText.style.display = 'none';
+          }, 500);
+
+          document.getElementById('letter').style.display = 'block';
+          document.querySelector('.audio-controls').style.display = 'flex';
+          document.getElementById('restart-btn').style.display = 'inline-block';
+          playMusic();
+          startPetalRain();
+        }
+
+        function playMusic() {
+          document.getElementById('bg-music').play().catch(err => {
+            console.log('No se pudo reproducir la música automáticamente:', err);
+          });
+        }
+
+        function pauseMusic() {
+          document.getElementById('bg-music').pause();
+        }
+
+        function restartPage() {
+          document.getElementById('letter').style.display = 'none';
+          document.getElementById('restart-btn').style.display = 'none';
+          document.getElementById('bg-music').pause();
+          document.getElementById('bg-music').currentTime = 0;
+          location.reload();
+        }
+
+        petalImg.onload = () => {
+          console.log('Imagen de pétalo cargada.');
+        };
+
+        const cake = document.getElementById('cake');
+        const corazon = document.getElementById('corazon');
+        const h1 = document.querySelector('h1');
+        let moving = true;
+
+        function moveCakeRandomly() {
+          if (!moving) return;
+          const x = Math.random() * (window.innerWidth - 100);
+          const y = Math.random() * (window.innerHeight - 100);
+          cake.style.left = `${x}px`;
+          cake.style.top = `${y}px`;
+          setTimeout(moveCakeRandomly, 800);
+        }
+
+        moveCakeRandomly();
+
+        document.addEventListener('mousemove', (e) => {
+          const cakeRect = cake.getBoundingClientRect();
+          const distance = Math.hypot(cakeRect.x + cakeRect.width / 2 - e.clientX, cakeRect.y + cakeRect.height / 2 - e.clientY);
+
+          if (distance < 50) {
+            catchCake();
+          }
+        });
+
+        function catchCake() {
+          moving = false;
+          cake.style.display = 'none';
+          corazon.style.display = 'block';
+          h1.textContent = ' ';
+        }
+      </script>
+    </div>
+  </div>
+</body>
+</html>
